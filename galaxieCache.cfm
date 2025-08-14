@@ -1,43 +1,43 @@
 <!---
 	Name         : galaxieCache.cfm
-	Author       : Gregory Alexander. Based upon scopeCache authored by Raymond Camden. 
-				 : Gregory Alexander *completely* overhauled the original scopeCache logic and added debugging cariages, JSON and HTML file formats when storing the data in files.
+	Author       : Gregory Alexander. Based upon the scopeCache library authored by Raymond Camden. 
+				 : Gregory Alexander *completely* overhauled the original scopeCache logic and added debugging cariages, JSON, and HTML file formats when storing the data in files.
 	Purpose		 : Allows you to cache content in various scopes.
 	
-	This tag allows you to cache content and data in various RAM based scopes. 
+	This tag allows you to cache content and data in various RAM-based scopes. 
 	The tag takes the following attributes:
 
-	name/cachename:	The name of the data. (required)
+	name/cachename:	The name of the data. Either name or cacheName is required. Use cacheName when using a cfmodule tag (required)
 	scope: 			The scope where cached data will reside. Must be either session, 
 					application, server, or file. (required)
 	fileType:		We can store the data as a WDDX packet, JSON, or HTML when the scope is set to 'file'. 
 					HTML is the most efficient and uses a simple cfinclude to output the data, however, it uses more disk space on the server. 
+	file:			Fully qualified file name for file-based caching. Only used when the scope is set to 'file'.
 	timeout: 		When the cache will timeout. By default, the year 3999 (i.e., never). 
 					Value must be either a date/time stamp or a number representing the
 					number of seconds until the timeout is reached. Use 0 if you want an immediate timeout to reset the cache data (optional)
 	dependancies:	This allows you to mark other cache items as dependant on this item. 
-					When this item is cleared or timesout, any child will also be cleared.
+					When this item is cleared or times out, any child will also be cleared.
 					Also, any children of those children will also be cleared. (optional)
 	clear:			If passed and if true, will clear out the cached item. Note that
-					this option will NOT recreate the cache. In other words, the rest of
+					This option will NOT recreate the cache. In other words, the rest of
 					the tag isn't run (well, mostly, but dont worry).
 	clearAll:		Removes all data from this scope. Exits the tag immediately.
-	cacheDirectory: The cache directory where the cached files resides is required if you're using clearAll and 
+	cacheDirectory: The cache directory where the cached files reside is required if you're using clearAll and 
 					you want to delete all of the cached files when using file and fileType html.
 	disabled:		Allows for a quick exit out of the tag. How would this be used? You can 
 					imagine using disabled="#request.disabled#" to allow for a quick way to
 					turn on/off caching for the entire site. Of course, all calls to the tag
 					would have to use the same value.
-	getCacheItems:	Returns a list of keys in the cache. Exists the tag when called. 
-					NOTICE! Some items may be expired. Items only get removed if you are fetching or clearing them.
+	getCacheItems:	Returns a list of keys in the cache. The tag exists when called. 
+					NOTICE! Some items may have expired. Items are only removed when you are fetching or clearing them.
 	getCacheData:	Returns the value directly.
-	data:			Sets the value directly.
-	file:			Fully qualified file name for file based caching.
+	
 	suppressHitCount: Only used for file operations - if passed, we dont bother updating the file based cache with the hit count. Makes the file IO a bit less.
 
-	License		 : Use this as you will.
+	License: 		Uses the Apache2 license.
 
-	When the tag is processed, we are outputting the data when the execution of the tag starts and creating the structure when the template execution ends.
+	When the tag is processed, we output the data at the start of tag execution and create the structure upon completion of template execution.
 
 	Example usage with cfmodule:
 	<cfmodule template="../../tags/galaxieCache.cfm" scope="application" cachename="#cacheName#" timeout="#(60*60)#" disabled="#application.disableCache#">
@@ -51,9 +51,9 @@
 <cfparam name="attributes.cachename" default="" type="string">
 <!--- Scope defaults to application --->
 <cfparam name="attributes.scope" default="application" type="string">
-<!--- Renders the data from the cache or from the content between the tags (or cfmodules). This argument is needed as you may want to reset the cache without rendering the page- for example, when a revised blog post is made and you only want to update the cache data. --->
+<!--- Renders the data from the cache or from the content between the tags (or cfmodules). This argument is necessary because you may need to reset the cache without rendering the page, for instance, when a revised blog post is published and you only want to update the cache data. --->
 <cfparam name="attributes.renderCacheData" default="true" type="boolean">
-<!--- Returns a list of keys in the cache. Exists the tag when called. --->
+<!--- Returns a list of keys in the cache. The tag exits when called. --->
 <cfparam name="attributes.getCacheData" default="false" type="boolean">
 <!--- The structure may be stored in a file using the WDDX format --->
 <cfparam name="attributes.file" default="" type="string">
@@ -61,7 +61,7 @@
 <cfparam name="attributes.fileType" default="html" type="string">
 <!--- Default dependancy list --->
 <cfparam name="attributes.dependancies" default="" type="string">
-<!--- suppressHitCount is turned off by default, however, I am suppressing the hit count when the file type is set to HTML as keeping it will consume more resources. When using html includes and want to increment the hit count, you must supply a timeout in the tag or module. --->
+<!--- suppressHitCount is turned off by default; however, I am suppressing the hit count when the file type is set to HTML, as keeping it will consume more resources. When using HTML includes and want to increment the hit count, you must supply a timeout in the tag or module. --->
 <cfparam name="attributes.suppressHitCount" default="false" type="boolean">
 <!--- The default timeout is no timeout, so we use the year 3999. We will have flying cars then. --->
 <cfparam name="attributes.timeout" default="#createDate(3999,1,1)#">
@@ -71,7 +71,7 @@
 <cfparam name="attributes.clear" default="false" type="boolean">
 <!--- Used to clear all items from the cache. Requires the cacheDirectory if you want to delete all of the files within a cache directory when using file with the fileType of html --->
 <cfparam name="attributes.clearAll" default="false" type="boolean">
-<!--- Specify the cacheDirectory if you want to clear the html based file cache. --->
+<!--- Specify the cacheDirectory if you want to clear the HTML-based file cache. --->
 <cfparam name="attributes.cacheDirectory" default="" type="string">
 <!--- Debug prints the process on the page --->
 <cfparam name="attributes.debug" default="false" type="boolean">
@@ -266,9 +266,9 @@
 			</cflock>
 		</cfif>
 
-		<!--- Cleanup the structure. Note: we need to cleanup the metadata on the server scope when using static HTML. --->
+		<!--- Cleanup the structure. Note: We need to clean up the metadata on the server scope when using static HTML. --->
 		<cfif attributes.fileType neq 'html'>
-			<!--- Delete the strucuture and clean up dependencies --->
+			<!--- Delete the structure and clean up dependencies --->
 			<cfset cleanup = scopeStruct.galaxieCache[attributes.name].dependancies>
 			<cfset structDelete(scopeStruct.galaxieCache,attributes.name)>
 		</cfif>
@@ -299,7 +299,7 @@
 		<cfif attributes.scope eq "file" and attributes.renderCacheData>
 			
 			<!--- ************************* HTML Includes *************************--->
-			<!--- Read the metadata in the server scope if it exists. HTML files will be stored in the server scope if there is a specified timeout, otherwise, the files will be stored on the server until manually cleared out. --->
+			<!--- Read the metadata in the server scope if it exists. HTML files will be stored in the server scope if there is a specified timeout; otherwise, the files will be stored on the server until manually cleared out. --->
 			<cfif useHtmlInclude>
 				
 				<!--- For html includes, we are *only* storing data in server scope when there is a timeout. If there is no time out, I will permanently  store the html on the server and it needs to be manually cleaned up when necessary. --->
@@ -311,7 +311,7 @@
 					<!--- Expire it when we have flying cars --->
 					<cfset htmlIncludeTimeout = createDate(3999,1,1)>
 					<cfset indefinateHtmlTimeout = true>
-					<!--- And supress the hit count as there will be no meta data in the server scope to process --->
+					<!--- And suppress the hit count as there will be no meta-data in the server scope to process --->
 					<cfset attributes.suppressHitCount = true>
 				</cfif>
 					
@@ -415,7 +415,7 @@
 						<cfdump var="#Data#" label="Data">
 					</cfif>
 					
-					<!--- Output the cache content if the current date less than the timeout. The timeout key in the structure may not exist if the file can't be read. This may occur when the file has been uploaded to the server and the user changes the fileType again --->
+					<!--- Output the cache content if the current date is less than the timeout. The timeout key in the structure may not exist if the file can't be read. This may occur when the file has been uploaded to the server and the user changes the fileType again --->
 					<cfif dateCompare(now(),data.timeout) is -1> 
 						<cfif debug>
 							Cache is valid and expires at <cfoutput>#data.timeout#</cfoutput><br/>
@@ -437,7 +437,7 @@
 							</cfif>
 							
 							<cflock name="#attributes.file#" type="exclusive" timeout="30">
-								<!--- Increment the hit count. Note: I supress the hitcount when using html --->
+								<!--- Increment the hit count. Note: I suppress the hitcount when using html --->
 								<cfset data.hitCount = data.hitCount + 1>
 								<!--- Save the file --->
 								<cfif attributes.fileType eq 'wddx'>
@@ -493,7 +493,7 @@
 					
 				<cfif attributes.getCacheData>
 					<cfif debug>
-						Return the value of the scoped structure to client<br/>
+						Return the value of the scoped structure to the client<br/>
 					</cfif>
 					<!--- Return the value back to the client --->
 					<cfset caller[attributes.getCacheData] = scopeStruct.galaxieCache[attributes.name].value>
@@ -526,7 +526,7 @@
 		
 		<!--- Dependencies may exist for everything other than storing the data to file  --->
 		<cfif attributes.scope neq 'file' or attributes.fileType eq 'html'>
-			<!--- It is possible I'm here because I'm refreshing. If so, clean up dependancies. --->
+			<!--- It is possible I'm here because I'm refreshing. If so, clean up dependencies. --->
 			<cfif structKeyExists(scopeStruct.galaxieCache,attributes.name)>
 				<cfif debug>
 					Cleaning dependencies<br/>
