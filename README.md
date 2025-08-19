@@ -38,8 +38,6 @@ There are multiple ways to invoke and store custom tags. I personally store this
 
 You should also save the function within the [flushGalaxieCacheFiles.cfm](https://github.com/GregoryAlexander77/GalaxieCache/blob/main/flushGalaxieCacheFiles.cfm) template to handle the cached files using your own custom events. 
 
-GalaxieCache on GitHub
-
 * * *
 
 Background
