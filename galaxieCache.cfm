@@ -68,7 +68,7 @@
 <!--- Specify the cacheDirectory if you want to clear the HTML-based file cache. --->
 <cfparam name="attributes.cacheDirectory" default="" type="string">
 <!--- Debug prints the process on the page --->
-<cfparam name="attributes.debug" default="true" type="boolean">
+<cfparam name="attributes.debug" default="false" type="boolean">
 <!--- Allows you to visualize the structure that is created --->
 <cfparam name="attributes.dumpStruct" default="false" type="boolean">
 <!--- By default, to conserve memory resources on the server, we are not saving the metadata with HTML files when there is an indefinite timeout. You can change this to always create the metadata along with the files, but other than for debugging or a custom solution that requires the metadata, this should be avoided as it consumes extra memory. --->
