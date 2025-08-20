@@ -1,26 +1,57 @@
-GalaxieCache is a wickedly fast custom tag that saves generated partial page content as a static page to the file system or RAM. Depending on your usage, GalaxieCache is one of the fastest caching solutions and uses native ColdFusion and Lucee cfinclude's to render the content. In it's simplist form, GalaxieCache reads the file property and tests to see if the specified file exists, and if it does, uses a cfinclude to render the page and exits the template. You can't get faster than that for content that does not need constant change!
+GalaxieCache is a wickedly fast custom tag that saves generated partial page content as a static page to the file system or RAM. Depending on your usage, GalaxieCache is one of the fastest caching solutions and uses native ColdFusion and Lucee cfinclude's to render the content.
+
+In its simplest form, GalaxieCache reads the file property and tests to see if the specified file exists, and if it does, uses a cfinclude to render the page and exits the template. You can't get faster than this!
 
 * * *
 
-Installation
-------------
+Table of Contents
+-----------------
 
-* * *
-
-To install GalaxieCache, download the files from the GitHub Repo at [https://github.com/GregoryAlexander77/GalaxieCache](https://github.com/GregoryAlexander77/GalaxieCache) and save the galaxieCache.cfm template to your preferred custom tag directory. 
-
-There are multiple ways to invoke and store custom tags. I personally store this tag in a tags directory and invoke galaxieCache using a [cfmodule](https://helpx.adobe.com/coldfusion/cfml-reference/coldfusion-tags/tags-m-o/cfmodule.html) tag. Choose whatever method you think best. See [https://helpx.adobe.com/coldfusion/developing-applications/building-blocks-of-coldfusion-applications/creating-and-using-custom-cfml-tags/creating-custom-tags.html](https://helpx.adobe.com/coldfusion/developing-applications/building-blocks-of-coldfusion-applications/creating-and-using-custom-cfml-tags/creating-custom-tags.html) for more information.
-
-You should also save the function within the [flushGalaxieCacheFiles.cfm](https://github.com/GregoryAlexander77/GalaxieCache/blob/main/flushGalaxieCacheFiles.cfm) template to handle the cached files using your own custom events. 
+*   [Background](#mcetoc_1j30ce75hj) 
+*   [Simple Examples](#mcetoc_1j30ce75hk)
+*   [Brief Description](#mcetoc_1j30ce75hl) 
+*   [Arguments](#mcetoc_1j30ce75hm)
+    *   [name or cacheName (one of these is required)](#mcetoc_1j30ce75hn)
+    *   [scope (required)](#mcetoc_1j30ce75ho)
+    *   [file (only used when scope is set to html or file)](#mcetoc_1j30ce75hp)
+    *   [fileType (only used when the scope is set to file)](#mcetoc_1j30ce75hq)
+    *   [timeout (optional)](#mcetoc_1j30ce75hr)
+    *   [disabled (optional)](#mcetoc_1j30ce75hs)
+    *   [clear (optional)](#mcetoc_1j30ce75ht)
+    *   [clearAll (optional)](#mcetoc_1j30ce75hu)
+    *   [cacheDirectory (only used with clearAll)](#mcetoc_1j30ce75hv)
+    *   [debug](#mcetoc_1j30ce75h10)
+*   [Considerations When Using HTML](#mcetoc_1j30ce75h11)
+    *   [Instead of Using Timeouts,  Use Events to Manage Files and Refresh Content](#mcetoc_1j30ce75h12)
+        *   [The flushGalaxieCacheFiles Function:](#mcetoc_1j30ce75h13)
+        *   [Function Usage Example](#mcetoc_1j30ce75h14)
+    *   [If you can't Refresh Content Using Events, use a Different Scope if the Content Requires Frequent Changes.](#mcetoc_1j30ce75h15)
 
 * * *
 
 Background
 ----------
 
+* * *
+
 GalaxieCache is a modern fork of [ScopeCache](https://www.raymondcamden.com/2004/01/08/F729C572-BF2B-430C-525FCCF58760CAD5), which [Ray Camden](https://www.raymondcamden.com/) created. I have personally experienced a _10-15% improvement over scopeCache_, which this is based upon, and a _5-10% performance improvement over using the [cfcache](https://helpx.adobe.com/coldfusion/cfml-reference/coldfusion-tags/tags-c/cfcache.html) tag_ when using [cfincludes](https://helpx.adobe.com/coldfusion/cfml-reference/coldfusion-tags/tags-i/cfinclude.html). There is virtually no overhead when using cfincludes, as ColdFusion and Lucee essentially copy the content of the included template to the page. Other than invoking the GalaxieCache custom tag, which on average takes slightly over 1 millisecond, there is no additional overhead after the content is initially generated.
 
-Like ScopeCache, GalaxieCache also supports caching the content to RAM using either the server, application, or session [scopes](https://helpx.adobe.com/coldfusion/developing-applications/developing-cfml-applications/using-persistent-data-and-locking/about-persistent-scope-variables.html). These scopes define the lifespan of the stored cache. You can also store the content on disk; however, this is the slowest available method because file system operations can be expensive. GalaxieCache also supports a timeout argument, which will refresh the content after a set period of time, and there is an optional debugging carriage that allows the developer to inspect what is going on under the hood. Finally, unlike using the cfcache tag, which has issues when used with Lucee, GalaxieCache also seamlessly works with both Lucee and Adobe ColdFusion using identical logic.
+Like ScopeCache, GalaxieCache also supports caching the content to RAM using either the server, application, or session [scopes](https://helpx.adobe.com/coldfusion/developing-applications/developing-cfml-applications/using-persistent-data-and-locking/about-persistent-scope-variables.html). These scopes define the lifespan of the stored cache. You can also store the content on disk using scope='file'; however, this is the slowest available method because file system operations can be expensive.
+
+GalaxieCache also supports a timeout argument, which will refresh the content after a given datetime or set period of time, and there is an optional debugging carriage that allows the developer to inspect what is going on under the hood. Finally, unlike using the cfcache tag, which has issues when used with Lucee, GalaxieCache also seamlessly works with both Lucee and Adobe ColdFusion using identical logic.
+
+Installation
+------------
+
+* * *
+
+To install GalaxieCache, download the files from the GitHub Repo at [https://github.com/GregoryAlexander77/GalaxieCache](https://github.com/GregoryAlexander77/GalaxieCache) and save the [galaxieCache.cfm](https://github.com/GregoryAlexander77/GalaxieCache/blob/main/galaxieCache.cfm) template to your preferred custom tag directory. 
+
+There are multiple ways to invoke and store custom tags. I personally store this tag in a tags directory and invoke galaxieCache using a [cfmodule](https://helpx.adobe.com/coldfusion/cfml-reference/coldfusion-tags/tags-m-o/cfmodule.html) tag. Choose whatever method you think best. See [https://helpx.adobe.com/coldfusion/developing-applications/building-blocks-of-coldfusion-applications/creating-and-using-custom-cfml-tags/creating-custom-tags.html](https://helpx.adobe.com/coldfusion/developing-applications/building-blocks-of-coldfusion-applications/creating-and-using-custom-cfml-tags/creating-custom-tags.html) for more information.
+
+You should also save the function within the [flushGalaxieCacheFiles.cfm](https://github.com/GregoryAlexander77/GalaxieCache/blob/main/flushGalaxieCacheFiles.cfm) template to handle the cached files using your own custom events. We will explain how to achieve this later in this article.
+
+GalaxieCache on GitHub
 
 * * *
 
@@ -177,8 +208,8 @@ Setting the debug argument to true allows developers to print out the activity o
 
 * * *
 
-Considerations When Using HTML
-------------------------------
+Considerations When Using scope='html'
+--------------------------------------
 
 * * *
 
@@ -196,7 +227,39 @@ Note: I am using a function to manage the content instead of putting this logic 
 
 * * *
 
-#### The flushGalaxieCacheFiles Function Usage Example:
+#### The flushGalaxieCacheFiles Function:
+
+* * *
+
+    <cffunction name="flushGalaxieCacheFiles" access="public" returntype="boolean" output="false"
+    		hint="Loops through files and deletes the cache files in a directory using the file name or a filter. When using GalaxieCache, the file name will be the name of the cache. Returns a boolean value to indicate if the function was run. Important note- for safety, you should only store the cache files in their own dedicated directory.">
+    	<cfargument name="directory" type="string" required="true" />
+    	<!--- Files that match a fileName or filter will be deleted. To delete all of the cache files in a directory, don't supply a string. --->
+    	<cfargument name="fileFilter" type="string" default="" required="false" />
+    	<!--- Set to true if you want to recursively delete files --->
+    	<cfargument name="recursive" type="boolean" default="false" required="false" />
+    
+    	<!--- Note: be careful if you don't specify a fileFilter as you may delete all of the files in a directory. If they are cache files, it is not a huge deal as they will be recreated again when someone visits a page when using Galaxie Cache. --->
+    	<cfif len(arguments.fileFilter)>
+    		<!--- Get the files that match the supplied file name or filter. --->
+    		<cfdirectory action="list" directory="#expandPath('#arguments.directory#')#" recurse="#arguments.recursive#" filter="*#arguments.fileFilter#*" name="cacheFiles"/>
+    	<cfelse>
+    		<!--- Get all of the files within the directory --->
+    		<cfdirectory action="list" directory="#expandPath('#arguments.directory#')#" recurse="#arguments.recursive#" name="cacheFiles"/>
+    	</cfif>
+    	<!--- Loop through the files found in the directory. --->
+    	<cfloop query="cacheFiles">
+    		<cflock name="#arguments.directory#" type="exclusive" timeout="30">
+    			<cffile action="delete" file="#expandPath(arguments.directory)#/#name#" />
+    		</cflock>
+    	</cfloop>
+    
+    	<cfreturn 1>
+    </cffunction>	
+
+* * *
+
+#### Function Usage Example
 
 * * *
 
@@ -226,5 +289,3 @@ The following code is used in Galaxie Blog when an administrator updates a blog 
 Although HTML offers fast performance, this method still requires generating the initial content and saving it to the filesystem, which slows down performance. If your content requires constant changes and you can't use events to refresh it, you may want to consider using a different scope instead.
 
 For example, Galaxie Blog displays the content of all new ColdFusion and Lucee blog posts. To display these posts, I programmatically check various RSS feeds every few minutes. Since I don't control the timing of the new posts and can't use events to refresh this content- for the CFBlogs feed, I use GalaxieCache with the application scope instead.
-
-* * *
