@@ -4,31 +4,6 @@ In its simplest form, GalaxieCache reads the file property and tests to see if t
 
 * * *
 
-Table of Contents
------------------
-
-*   [Background](#mcetoc_1j30ce75hj) 
-*   [Simple Examples](#mcetoc_1j30ce75hk)
-*   [Brief Description](#mcetoc_1j30ce75hl) 
-*   [Arguments](#mcetoc_1j30ce75hm)
-    *   [name or cacheName (one of these is required)](#mcetoc_1j30ce75hn)
-    *   [scope (required)](#mcetoc_1j30ce75ho)
-    *   [file (only used when scope is set to html or file)](#mcetoc_1j30ce75hp)
-    *   [fileType (only used when the scope is set to file)](#mcetoc_1j30ce75hq)
-    *   [timeout (optional)](#mcetoc_1j30ce75hr)
-    *   [disabled (optional)](#mcetoc_1j30ce75hs)
-    *   [clear (optional)](#mcetoc_1j30ce75ht)
-    *   [clearAll (optional)](#mcetoc_1j30ce75hu)
-    *   [cacheDirectory (only used with clearAll)](#mcetoc_1j30ce75hv)
-    *   [debug](#mcetoc_1j30ce75h10)
-*   [Considerations When Using HTML](#mcetoc_1j30ce75h11)
-    *   [Instead of Using Timeouts,  Use Events to Manage Files and Refresh Content](#mcetoc_1j30ce75h12)
-        *   [The flushGalaxieCacheFiles Function:](#mcetoc_1j30ce75h13)
-        *   [Function Usage Example](#mcetoc_1j30ce75h14)
-    *   [If you can't Refresh Content Using Events, use a Different Scope if the Content Requires Frequent Changes.](#mcetoc_1j30ce75h15)
-
-* * *
-
 Background
 ----------
 
