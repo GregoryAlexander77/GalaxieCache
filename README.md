@@ -39,7 +39,7 @@ To cache content that uses a cfinclude, simply wrap the content using a tag or a
 
 * * *
 
-    <cfmodule template="galaxieCache.cfm" cachename="example" scope="file" fileType="html" file="#application.baseUrl#/test/example.cfm">
+    <cfmodule template="galaxieCache.cfm" cachename="example" scope="html" file="#application.baseUrl#/test/example.cfm">
     <p>Simple GalaxieCache Example on <cfoutput>#dateFormat(now())</cfoutput>#</p>
     </cfmodule>
 
