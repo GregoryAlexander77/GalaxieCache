@@ -79,12 +79,12 @@ Arguments
 
 The name or cacheName specifies the key that the structure is stored in. You should use cacheName instead of name when using a cfmodule.
 
-This name is used to create a cached key and it is dyanmic. A new cache item will be created for each unique key. For example, in Galaxie Blog, I have nearly 40 different themes and I append a themeId to the name in order to create unique cached content tailored to each theme. You can also use dynamic URL variables like so:
+This name is used to create a dynamic cached key. A new cache item will be created for each unique key. For example, in Galaxie Blog, I have nearly 40 different themes and I append a themeId to the name in order to create unique cached content tailored to each theme. You can also use dynamic URL variables like so:
 
 * * *
 
     <cfset cacheName = "testHtml=" & URL.themeId>
-    <cfmodule template="#application.baseUrl#/tags/galaxieCache.cfm" cachename="#cachename#" scope="file" fileType="html" file="#application.baseUrl#/cache/posts/#cacheName#.cfm" debug="true" disabled="false">
+    <cfmodule template="#application.baseUrl#/tags/galaxieCache.cfm" cachename="#cachename#" scope="html" file="#application.baseUrl#/cache/posts/#cacheName#.cfm" debug="true" disabled="false">
     This cache is unique to the <cfoutput>#URL.themeName#</cfoutput>
     </cfmodule>
 
